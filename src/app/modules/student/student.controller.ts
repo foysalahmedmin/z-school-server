@@ -11,7 +11,11 @@ const findAllStudents = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: 'Something is went wrong',
+      error: err,
+    });
   }
 };
 const findOneStudent = async (req: Request, res: Response) => {
@@ -25,7 +29,11 @@ const findOneStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: 'Something is went wrong',
+      error: err,
+    });
   }
 };
 
@@ -40,7 +48,11 @@ const insertStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (err) {
-    console.log(err);
+    res.status(500).json({
+      success: false,
+      message: 'Something is went wrong',
+      error: err,
+    });
   }
 };
 

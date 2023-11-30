@@ -2,9 +2,22 @@ import { Schema, model } from 'mongoose';
 import { Address, Guardian, Name, Student } from './student.interface';
 
 const nameSchema = new Schema<Name>({
-  first_name: { type: String, required: [true, 'First name is required'] },
-  middle_name: { type: String },
-  last_name: { type: String },
+  first_name: {
+    type: String,
+    required: [true, 'First name is required'],
+    maxlength: 20,
+    trim: true,
+    validate: {
+      validator: function (value: string) {
+        const correctValue =
+          value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+        return value === correctValue;
+      },
+      message: '{VALUE} is not in capitalize format',
+    },
+  },
+  middle_name: { type: String, maxlength: 20, trim: true },
+  last_name: { type: String, maxlength: 20, trim: true },
 });
 
 const addressSchema = new Schema<Address>({
