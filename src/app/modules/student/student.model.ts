@@ -30,9 +30,7 @@ const nameSchema = new Schema<Name>({
     maxlength: 20,
     trim: true,
     validate: {
-      validator: function (value: string) {
-        return capitalizeValidator(value);
-      },
+      validator: capitalizeValidator,
       message: '{VALUE} is not in capitalize format',
     },
   },
@@ -41,9 +39,7 @@ const nameSchema = new Schema<Name>({
     maxlength: 20,
     trim: true,
     validate: {
-      validator: function (value: string) {
-        return capitalizeValidator(value);
-      },
+      validator: capitalizeValidator,
       message: '{VALUE} is not in capitalize format',
     },
   },
@@ -52,9 +48,7 @@ const nameSchema = new Schema<Name>({
     maxlength: 20,
     trim: true,
     validate: {
-      validator: function (value: string) {
-        return capitalizeValidator(value);
-      },
+      validator: capitalizeValidator,
       message: '{VALUE} is not in capitalize format',
     },
   },
@@ -73,9 +67,7 @@ const guardianSchema = new Schema<Guardian>({
     type: String,
     required: true,
     validate: {
-      validator: function (value: string) {
-        return isValidBangladeshContactNumber(value);
-      },
+      validator: isValidBangladeshContactNumber,
       message: '{VALUE} is not valid contact number',
     },
   },
@@ -91,18 +83,14 @@ const StudentSchema = new Schema<Student>({
   profile_image: {
     type: String,
     validate: {
-      validator: function (value: string) {
-        return isValidURL(value);
-      },
+      validator: isValidURL,
       message: '{VALUE} is not valid url',
     },
   },
   avatar: {
     type: String,
     validate: {
-      validator: function (value: string) {
-        return isValidURL(value);
-      },
+      validator: isValidURL,
       message: '{VALUE} is not valid url',
     },
   },
@@ -120,9 +108,7 @@ const StudentSchema = new Schema<Student>({
     required: true,
     unique: true,
     validate: {
-      validator: function (value: string) {
-        return isValidEmail(value);
-      },
+      validator: isValidEmail,
       message: '{VALUE} is not valid email address',
     },
   },
@@ -131,9 +117,7 @@ const StudentSchema = new Schema<Student>({
     required: true,
     unique: true,
     validate: {
-      validator: function (value: string) {
-        return isValidBangladeshContactNumber(value);
-      },
+      validator: isValidBangladeshContactNumber,
       message: '{VALUE} is not valid contact number',
     },
   },
@@ -141,9 +125,7 @@ const StudentSchema = new Schema<Student>({
     type: String,
     required: true,
     validate: {
-      validator: function (value: string) {
-        return isValidBangladeshContactNumber(value);
-      },
+      validator: isValidBangladeshContactNumber,
       message: '{VALUE} is not valid contact number',
     },
   },

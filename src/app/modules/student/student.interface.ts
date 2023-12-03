@@ -22,7 +22,7 @@ export interface Student {
   name: Name;
   profile_image?: string;
   avatar?: string;
-  gender?: 'male' | 'female';
+  gender?: 'male' | 'female' | 'others';
   date_of_birth?: string;
   email: string;
   contact_number: string;
