@@ -11,10 +11,10 @@ const findAllStudents = async (req: Request, res: Response) => {
       message: 'Student are retrieved successfully',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Something is went wrong',
+      message: err.message || 'Something is went wrong',
       error: err,
     });
   }
@@ -29,10 +29,10 @@ const findOneStudent = async (req: Request, res: Response) => {
       message: 'Student are retrieved successfully',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Something is went wrong',
+      message: err.message || 'Something is went wrong',
       error: err,
     });
   }
@@ -49,10 +49,10 @@ const insertStudent = async (req: Request, res: Response) => {
       message: 'Student is inserted successfully',
       data: result,
     });
-  } catch (err) {
+  } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: 'Something is went wrong',
+      message: err.message || 'Something is went wrong',
       error: err,
     });
   }

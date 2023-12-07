@@ -1,5 +1,12 @@
 import { Schema, model } from 'mongoose';
-import { Address, Guardian, Name, Student } from './student.interface';
+import {
+  TAddress,
+  TGuardian,
+  TName,
+  TStudent,
+  TStudentMethods,
+  TStudentModel,
+} from './student.interface';
 
 function capitalizeValidator(value: string) {
   const correctValue =
@@ -23,7 +30,7 @@ function isValidURL(url: string) {
   return urlPattern.test(url);
 }
 
-const nameSchema = new Schema<Name>({
+const nameSchema = new Schema<TName>({
   first_name: {
     type: String,
     required: [true, 'First name is required'],
@@ -54,12 +61,12 @@ const nameSchema = new Schema<Name>({
   },
 });
 
-const addressSchema = new Schema<Address>({
+const addressSchema = new Schema<TAddress>({
   present: { type: String, required: true },
   permanent: { type: String, required: true },
 });
 
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
   name: { type: String, required: true },
   relation: { type: String, required: true },
   occupation: { type: String, required: true },
@@ -74,7 +81,7 @@ const guardianSchema = new Schema<Guardian>({
   address: addressSchema,
 });
 
-const StudentSchema = new Schema<Student>({
+const StudentSchema = new Schema<TStudent, TStudentModel, TStudentMethods>({
   id: { type: String, required: true, unique: true },
   name: {
     type: nameSchema,
@@ -145,4 +152,10 @@ const StudentSchema = new Schema<Student>({
   is_active: { type: Boolean, default: true, required: true },
 });
 
-export const StudentModel = model<Student>('Student', StudentSchema);
+// Custom instance methods ;
+StudentSchema.methods.isUserExist = async function (id: string) {
+  const existingUser = await Student.findOne({ id });
+  return existingUser;
+};
+
+export const Student = model<TStudent, TStudentModel>('Student', StudentSchema);
