@@ -158,11 +158,11 @@ const StudentSchema = new Schema<TStudent, TStudentModel>({
   guardian: { type: [guardianSchema], required: true },
   local_guardian: { type: guardianSchema, required: true },
   is_active: { type: Boolean, default: true, required: true },
+  is_deleted: { type: Boolean, default: false, required: true },
 });
 
 // Pre save middleware/ hook
 StudentSchema.pre('save', async function (next) {
-  console.log(this, 'pre hook : we will save data');
   this.password = await bcrypt.hash(
     this.password,
     Number(config.bcrypt_salt_rounds),
@@ -171,8 +171,25 @@ StudentSchema.pre('save', async function (next) {
 });
 
 // post save middleware/ hook
-StudentSchema.post('save', function () {
-  console.log(this, 'pre hook : we saved data');
+StudentSchema.post('save', function (document, next) {
+  document.password = '';
+  next();
+});
+
+// Query middleware/ hook
+StudentSchema.pre('find', function (next) {
+  this.find({ is_deleted: { $ne: true } });
+  next();
+});
+
+StudentSchema.pre('findOne', function (next) {
+  this.findOne({ is_deleted: { $ne: true } });
+  next();
+});
+
+StudentSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { is_deleted: { $ne: true } } });
+  next();
 });
 
 // Custom static methods ;

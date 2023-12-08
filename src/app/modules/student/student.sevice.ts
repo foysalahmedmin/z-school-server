@@ -28,8 +28,17 @@ const findOneStudentFromDB = async (username: string) => {
   return result;
 };
 
+const deleteOneStudentFromDB = async (username: string) => {
+  const result = await Student.updateOne(
+    { username: username },
+    { is_deleted: true },
+  );
+  return result;
+};
+
 export const StudentServices = {
   findAllStudentsFromDB,
   findOneStudentFromDB,
   insertStudentIntoDB,
+  deleteOneStudentFromDB,
 };

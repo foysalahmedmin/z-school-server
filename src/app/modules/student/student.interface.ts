@@ -35,6 +35,7 @@ export interface TStudent {
   guardian: TGuardian[];
   local_guardian?: TGuardian;
   is_active: boolean;
+  is_deleted: boolean;
 }
 
 // For static methods;

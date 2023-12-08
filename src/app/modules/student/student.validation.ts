@@ -70,6 +70,7 @@ const studentValidationSchema = z.object({
   guardian: z.array(guardianValidationSchema),
   local_guardian: guardianValidationSchema,
   is_active: z.boolean().default(true),
+  is_deleted: z.boolean().default(false),
 });
 
 export default studentValidationSchema;
