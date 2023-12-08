@@ -3,8 +3,8 @@ import { StudentController } from './student.controller';
 
 const router = express.Router();
 
-router.get('/', StudentController.findAllStudents);
-router.get('/:id', StudentController.findOneStudent);
 router.post('/insert', StudentController.insertStudent);
+router.get('/', StudentController.findAllStudents);
+router.get('/:username', StudentController.findOneStudent);
 
 export const StudentRoues = router;

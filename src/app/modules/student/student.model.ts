@@ -1,10 +1,12 @@
+import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
+import config from '../../config';
 import {
   TAddress,
   TGuardian,
   TName,
   TStudent,
-  TStudentMethods,
+  // TStudentMethods,
   TStudentModel,
 } from './student.interface';
 
@@ -81,8 +83,14 @@ const guardianSchema = new Schema<TGuardian>({
   address: addressSchema,
 });
 
-const StudentSchema = new Schema<TStudent, TStudentModel, TStudentMethods>({
-  id: { type: String, required: true, unique: true },
+const StudentSchema = new Schema<TStudent, TStudentModel>({
+  username: { type: String, required: true, unique: true },
+  password: {
+    type: String,
+    required: true,
+    minlength: [6, 'the password should minimum 6 character'],
+    maxlength: [12, 'the password should maximum 12 character'],
+  },
   name: {
     type: nameSchema,
     required: true,
@@ -152,10 +160,31 @@ const StudentSchema = new Schema<TStudent, TStudentModel, TStudentMethods>({
   is_active: { type: Boolean, default: true, required: true },
 });
 
-// Custom instance methods ;
-StudentSchema.methods.isUserExist = async function (id: string) {
-  const existingUser = await Student.findOne({ id });
+// Pre save middleware/ hook
+StudentSchema.pre('save', async function (next) {
+  console.log(this, 'pre hook : we will save data');
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+// post save middleware/ hook
+StudentSchema.post('save', function () {
+  console.log(this, 'pre hook : we saved data');
+});
+
+// Custom static methods ;
+StudentSchema.statics.isUserExist = async function (username: string) {
+  const existingUser = await Student.findOne({ username: username });
   return existingUser;
 };
+
+// Custom instance methods ;
+// StudentSchema.methods.isUserExist = async function (id: string) {
+//   const existingUser = await Student.findOne({ id : id });
+//   return existingUser;
+// };
 
 export const Student = model<TStudent, TStudentModel>('Student', StudentSchema);

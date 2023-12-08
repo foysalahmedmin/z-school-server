@@ -49,7 +49,8 @@ const guardianValidationSchema = z.object({
 });
 
 const studentValidationSchema = z.object({
-  id: z.string(),
+  username: z.string(),
+  password: z.string().min(6).max(12),
   name: nameValidationSchema,
   profile_image: z.string().url().optional(),
   avatar: z.string().url().optional(),

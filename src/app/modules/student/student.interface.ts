@@ -20,7 +20,8 @@ export interface TGuardian {
 }
 
 export interface TStudent {
-  id: string;
+  username: string;
+  password: string;
   name: TName;
   profile_image?: string;
   avatar?: string;
@@ -36,12 +37,18 @@ export interface TStudent {
   is_active: boolean;
 }
 
-export interface TStudentMethods {
+// For static methods;
+export interface TStudentModel extends Model<TStudent> {
   isUserExist(id: string): Promise<TStudent | null>;
 }
 
-export type TStudentModel = Model<
-  TStudent,
-  Record<string, never>,
-  TStudentMethods
->;
+// For instance methods;
+// export interface TStudentMethods {
+//   isUserExist(id: string): Promise<TStudent | null>;
+// }
+
+// export type TStudentModel = Model<
+//   TStudent,
+//   Record<string, never>,
+//   TStudentMethods
+// >;
