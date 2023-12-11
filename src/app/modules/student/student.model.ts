@@ -83,82 +83,100 @@ const guardianSchema = new Schema<TGuardian>({
   address: addressSchema,
 });
 
-const StudentSchema = new Schema<TStudent, TStudentModel>({
-  username: { type: String, required: true, unique: true },
-  password: {
-    type: String,
-    required: true,
-    minlength: [6, 'the password should minimum 6 character'],
-    maxlength: [12, 'the password should maximum 12 character'],
+const StudentSchema = new Schema<TStudent, TStudentModel>(
+  {
+    username: { type: String, required: true, unique: true },
+    password: {
+      type: String,
+      required: true,
+      minlength: [6, 'the password should minimum 6 character'],
+      maxlength: [12, 'the password should maximum 12 character'],
+    },
+    name: {
+      type: nameSchema,
+      required: true,
+    },
+    profile_image: {
+      type: String,
+      validate: {
+        validator: isValidURL,
+        message: '{VALUE} is not valid url',
+      },
+    },
+    avatar: {
+      type: String,
+      validate: {
+        validator: isValidURL,
+        message: '{VALUE} is not valid url',
+      },
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: ['male', 'female', 'others'],
+        message:
+          "The gender field can only one of the following: 'male', 'female' or 'others'",
+      },
+    },
+    date_of_birth: { type: String },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: isValidEmail,
+        message: '{VALUE} is not valid email address',
+      },
+    },
+    contact_number: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: {
+        validator: isValidBangladeshContactNumber,
+        message: '{VALUE} is not valid contact number',
+      },
+    },
+    emergency_contact_number: {
+      type: String,
+      required: true,
+      validate: {
+        validator: isValidBangladeshContactNumber,
+        message: '{VALUE} is not valid contact number',
+      },
+    },
+    blood_group: {
+      type: String,
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message: '{VALUE} is not valid',
+      },
+    },
+    address: {
+      type: addressSchema,
+      required: true,
+    },
+    guardian: { type: [guardianSchema], required: true },
+    local_guardian: { type: guardianSchema, required: true },
+    is_active: { type: Boolean, default: true, required: true },
+    is_deleted: { type: Boolean, default: false, required: true },
   },
-  name: {
-    type: nameSchema,
-    required: true,
-  },
-  profile_image: {
-    type: String,
-    validate: {
-      validator: isValidURL,
-      message: '{VALUE} is not valid url',
+  {
+    toJSON: {
+      virtuals: true,
     },
   },
-  avatar: {
-    type: String,
-    validate: {
-      validator: isValidURL,
-      message: '{VALUE} is not valid url',
-    },
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: ['male', 'female', 'others'],
-      message:
-        "The gender field can only one of the following: 'male', 'female' or 'others'",
-    },
-  },
-  date_of_birth: { type: String },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: isValidEmail,
-      message: '{VALUE} is not valid email address',
-    },
-  },
-  contact_number: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator: isValidBangladeshContactNumber,
-      message: '{VALUE} is not valid contact number',
-    },
-  },
-  emergency_contact_number: {
-    type: String,
-    required: true,
-    validate: {
-      validator: isValidBangladeshContactNumber,
-      message: '{VALUE} is not valid contact number',
-    },
-  },
-  blood_group: {
-    type: String,
-    enum: {
-      values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-      message: '{VALUE} is not valid',
-    },
-  },
-  address: {
-    type: addressSchema,
-    required: true,
-  },
-  guardian: { type: [guardianSchema], required: true },
-  local_guardian: { type: guardianSchema, required: true },
-  is_active: { type: Boolean, default: true, required: true },
-  is_deleted: { type: Boolean, default: false, required: true },
+);
+
+// virtual
+StudentSchema.virtual('full_name').get(function () {
+  return (
+    this.name.first_name +
+    ' ' +
+    this.name.middle_name +
+    ' ' +
+    this.name.last_name
+  );
 });
 
 // Pre save middleware/ hook

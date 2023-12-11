@@ -40,12 +40,12 @@ export interface TStudent {
 
 // For static methods;
 export interface TStudentModel extends Model<TStudent> {
-  isUserExist(id: string): Promise<TStudent | null>;
+  isUserExist(username: string): Promise<TStudent | null>;
 }
 
 // For instance methods;
 // export interface TStudentMethods {
-//   isUserExist(id: string): Promise<TStudent | null>;
+//   isUserExist(username: string): Promise<TStudent | null>;
 // }
 
 // export type TStudentModel = Model<
