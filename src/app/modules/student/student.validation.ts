@@ -34,8 +34,18 @@ const nameValidationSchema = z.object({
 });
 
 const addressValidationSchema = z.object({
-  present: z.string(),
-  permanent: z.string(),
+  present: z
+    .object({
+      country: z.string(),
+      street: z.string(),
+      city: z.string(),
+    })
+    .optional(),
+  permanent: z.object({
+    country: z.string(),
+    street: z.string(),
+    city: z.string(),
+  }),
 });
 
 const guardianValidationSchema = z.object({
@@ -49,28 +59,31 @@ const guardianValidationSchema = z.object({
 });
 
 const studentValidationSchema = z.object({
-  username: z.string(),
   password: z.string().min(6).max(12),
-  name: nameValidationSchema,
-  profile_image: z.string().url().optional(),
-  avatar: z.string().url().optional(),
-  gender: z.enum(['male', 'female', 'others']).optional(),
-  date_of_birth: z.string().optional(),
-  email: z.string().email(),
-  contact_number: z.string().refine(isValidBangladeshContactNumber, {
-    message: 'Contact number is not valid',
+  student: z.object({
+    name: nameValidationSchema,
+    profile_image: z.string().url().optional(),
+    avatar: z.string().url().optional(),
+    gender: z.enum(['male', 'female', 'others']).optional(),
+    date_of_birth: z.string().optional(),
+    email: z.string().email(),
+    contact_number: z.string().refine(isValidBangladeshContactNumber, {
+      message: 'Contact number is not valid',
+    }),
+    emergency_contact_number: z
+      .string()
+      .refine(isValidBangladeshContactNumber, {
+        message: 'Emergency contact number is not valid',
+      }),
+    blood_group: z
+      .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+      .optional(),
+    address: addressValidationSchema,
+    guardian: z.array(guardianValidationSchema),
+    local_guardian: guardianValidationSchema,
+    admission_semester: z.string().optional(),
+    academic_department: z.string().optional(),
   }),
-  emergency_contact_number: z.string().refine(isValidBangladeshContactNumber, {
-    message: 'Emergency contact number is not valid',
-  }),
-  blood_group: z
-    .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
-    .optional(),
-  address: addressValidationSchema,
-  guardian: z.array(guardianValidationSchema),
-  local_guardian: guardianValidationSchema,
-  is_active: z.boolean().default(true),
-  is_deleted: z.boolean().default(false),
 });
 
 export default studentValidationSchema;

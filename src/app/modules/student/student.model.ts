@@ -1,6 +1,4 @@
-import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
-import config from '../../config';
 import {
   TAddress,
   TGuardian,
@@ -64,8 +62,21 @@ const nameSchema = new Schema<TName>({
 });
 
 const addressSchema = new Schema<TAddress>({
-  present: { type: String, required: true },
-  permanent: { type: String, required: true },
+  present: {
+    type: {
+      country: { type: String, required: true },
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+    },
+  },
+  permanent: {
+    type: {
+      country: { type: String, required: true },
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+    },
+    required: true,
+  },
 });
 
 const guardianSchema = new Schema<TGuardian>({
@@ -86,12 +97,12 @@ const guardianSchema = new Schema<TGuardian>({
 const StudentSchema = new Schema<TStudent, TStudentModel>(
   {
     username: { type: String, required: true, unique: true },
-    password: {
-      type: String,
-      required: true,
-      minlength: [6, 'the password should minimum 6 character'],
-      maxlength: [12, 'the password should maximum 12 character'],
-    },
+    // password: {
+    //   type: String,
+    //   required: true,
+    //   minlength: [6, 'the password should minimum 6 character'],
+    //   maxlength: [12, 'the password should maximum 12 character'],
+    // },
     name: {
       type: nameSchema,
       required: true,
@@ -158,8 +169,9 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
     },
     guardian: { type: [guardianSchema], required: true },
     local_guardian: { type: guardianSchema, required: true },
-    is_active: { type: Boolean, default: true, required: true },
-    is_deleted: { type: Boolean, default: false, required: true },
+    admission_semester: { type: Schema.Types.ObjectId },
+    academic_department: { type: Schema.Types.ObjectId },
+    is_deleted: { type: Boolean, default: false },
   },
   {
     toJSON: {
@@ -180,19 +192,19 @@ StudentSchema.virtual('full_name').get(function () {
 });
 
 // Pre save middleware/ hook
-StudentSchema.pre('save', async function (next) {
-  this.password = await bcrypt.hash(
-    this.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-  next();
-});
+// StudentSchema.pre('save', async function (next) {
+//   this.password = await bcrypt.hash(
+//     this.password,
+//     Number(config.bcrypt_salt_rounds),
+//   );
+//   next();
+// });
 
 // post save middleware/ hook
-StudentSchema.post('save', function (document, next) {
-  document.password = '';
-  next();
-});
+// StudentSchema.post('save', function (document, next) {
+//   document.password = '';
+//   next();
+// });
 
 // Query middleware/ hook
 StudentSchema.pre('find', function (next) {

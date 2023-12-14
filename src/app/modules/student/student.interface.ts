@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 export interface TName {
   first_name: string;
@@ -7,8 +7,16 @@ export interface TName {
 }
 
 export interface TAddress {
-  present: string;
-  permanent: string;
+  present?: {
+    country: string;
+    street: string;
+    city: string;
+  };
+  permanent: {
+    country: string;
+    street: string;
+    city: string;
+  };
 }
 
 export interface TGuardian {
@@ -20,13 +28,14 @@ export interface TGuardian {
 }
 
 export interface TStudent {
+  id: string;
+  user: Types.ObjectId;
   username: string;
-  password: string;
   name: TName;
   profile_image?: string;
   avatar?: string;
   gender?: 'male' | 'female' | 'others';
-  date_of_birth?: string;
+  date_of_birth?: Date;
   email: string;
   contact_number: string;
   emergency_contact_number: string;
@@ -34,7 +43,8 @@ export interface TStudent {
   address: TAddress;
   guardian: TGuardian[];
   local_guardian?: TGuardian;
-  is_active: boolean;
+  admission_semester?: Types.ObjectId;
+  academic_department?: Types.ObjectId;
   is_deleted: boolean;
 }
 
