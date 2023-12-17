@@ -7,16 +7,15 @@ export interface TName {
 }
 
 export interface TAddress {
-  present?: {
-    country: string;
-    street: string;
-    city: string;
-  };
-  permanent: {
-    country: string;
-    street: string;
-    city: string;
-  };
+  country: string;
+  street: string;
+  city: string;
+  details?: string;
+}
+
+export interface TFullAddress {
+  present?: TAddress;
+  permanent: TAddress;
 }
 
 export interface TGuardian {
@@ -40,7 +39,7 @@ export interface TStudent {
   contact_number: string;
   emergency_contact_number: string;
   blood_group?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
-  address: TAddress;
+  address: TFullAddress;
   guardian: TGuardian[];
   local_guardian?: TGuardian;
   admission_semester?: Types.ObjectId;

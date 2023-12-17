@@ -1,6 +1,7 @@
-import { Schema, model } from 'mongoose';
+import { Query, Schema, model } from 'mongoose';
 import {
   TAddress,
+  TFullAddress,
   TGuardian,
   TName,
   TStudent,
@@ -62,19 +63,18 @@ const nameSchema = new Schema<TName>({
 });
 
 const addressSchema = new Schema<TAddress>({
+  country: { type: String, required: true },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  details: { type: String },
+});
+
+const fullAddressSchema = new Schema<TFullAddress>({
   present: {
-    type: {
-      country: { type: String, required: true },
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-    },
+    type: addressSchema,
   },
   permanent: {
-    type: {
-      country: { type: String, required: true },
-      street: { type: String, required: true },
-      city: { type: String, required: true },
-    },
+    type: addressSchema,
     required: true,
   },
 });
@@ -96,13 +96,14 @@ const guardianSchema = new Schema<TGuardian>({
 
 const StudentSchema = new Schema<TStudent, TStudentModel>(
   {
+    id: { type: String, required: true, unique: true },
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      ref: 'User',
+    },
     username: { type: String, required: true, unique: true },
-    // password: {
-    //   type: String,
-    //   required: true,
-    //   minlength: [6, 'the password should minimum 6 character'],
-    //   maxlength: [12, 'the password should maximum 12 character'],
-    // },
     name: {
       type: nameSchema,
       required: true,
@@ -164,7 +165,7 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
       },
     },
     address: {
-      type: addressSchema,
+      type: fullAddressSchema,
       required: true,
     },
     guardian: { type: [guardianSchema], required: true },
@@ -191,29 +192,9 @@ StudentSchema.virtual('full_name').get(function () {
   );
 });
 
-// Pre save middleware/ hook
-// StudentSchema.pre('save', async function (next) {
-//   this.password = await bcrypt.hash(
-//     this.password,
-//     Number(config.bcrypt_salt_rounds),
-//   );
-//   next();
-// });
-
-// post save middleware/ hook
-// StudentSchema.post('save', function (document, next) {
-//   document.password = '';
-//   next();
-// });
-
 // Query middleware/ hook
-StudentSchema.pre('find', function (next) {
+StudentSchema.pre(/^find/, function (this: Query<TStudent, Document>, next) {
   this.find({ is_deleted: { $ne: true } });
-  next();
-});
-
-StudentSchema.pre('findOne', function (next) {
-  this.findOne({ is_deleted: { $ne: true } });
   next();
 });
 
@@ -229,9 +210,9 @@ StudentSchema.statics.isUserExist = async function (username: string) {
 };
 
 // Custom instance methods ;
-// StudentSchema.methods.isUserExist = async function (id: string) {
-//   const existingUser = await Student.findOne({ id : id });
-//   return existingUser;
-// };
+StudentSchema.methods.isUserExist = async function (id: string) {
+  const existingUser = await Student.findOne({ id: id });
+  return existingUser;
+};
 
 export const Student = model<TStudent, TStudentModel>('Student', StudentSchema);

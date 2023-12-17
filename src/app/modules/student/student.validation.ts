@@ -34,18 +34,15 @@ const nameValidationSchema = z.object({
 });
 
 const addressValidationSchema = z.object({
-  present: z
-    .object({
-      country: z.string(),
-      street: z.string(),
-      city: z.string(),
-    })
-    .optional(),
-  permanent: z.object({
-    country: z.string(),
-    street: z.string(),
-    city: z.string(),
-  }),
+  country: z.string(),
+  street: z.string(),
+  city: z.string(),
+  details: z.string().optional(),
+});
+
+const fullAddressValidationSchema = z.object({
+  present: addressValidationSchema.optional(),
+  permanent: addressValidationSchema,
 });
 
 const guardianValidationSchema = z.object({
@@ -59,6 +56,7 @@ const guardianValidationSchema = z.object({
 });
 
 const studentValidationSchema = z.object({
+  username: z.string(),
   password: z.string().min(6).max(12),
   student: z.object({
     name: nameValidationSchema,
@@ -78,11 +76,12 @@ const studentValidationSchema = z.object({
     blood_group: z
       .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
       .optional(),
-    address: addressValidationSchema,
+    address: fullAddressValidationSchema,
     guardian: z.array(guardianValidationSchema),
     local_guardian: guardianValidationSchema,
     admission_semester: z.string().optional(),
     academic_department: z.string().optional(),
+    is_deleted: z.boolean().default(false).optional(),
   }),
 });
 
