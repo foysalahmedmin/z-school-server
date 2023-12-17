@@ -55,34 +55,37 @@ const guardianValidationSchema = z.object({
   address: addressValidationSchema.optional(),
 });
 
-const studentValidationSchema = z.object({
-  username: z.string(),
-  password: z.string().min(6).max(12),
-  student: z.object({
-    name: nameValidationSchema,
-    profile_image: z.string().url().optional(),
-    avatar: z.string().url().optional(),
-    gender: z.enum(['male', 'female', 'others']).optional(),
-    date_of_birth: z.string().optional(),
-    email: z.string().email(),
-    contact_number: z.string().refine(isValidBangladeshContactNumber, {
-      message: 'Contact number is not valid',
-    }),
-    emergency_contact_number: z
-      .string()
-      .refine(isValidBangladeshContactNumber, {
-        message: 'Emergency contact number is not valid',
+const studentValidation = z.object({
+  body: z.object({
+    username: z.string(),
+    password: z.string().min(6).max(12),
+    student: z.object({
+      name: nameValidationSchema,
+      profile_image: z.string().url().optional(),
+      avatar: z.string().url().optional(),
+      gender: z.enum(['male', 'female', 'others']).optional(),
+      date_of_birth: z.string().optional(),
+      email: z.string().email(),
+      contact_number: z.string().refine(isValidBangladeshContactNumber, {
+        message: 'Contact number is not valid',
       }),
-    blood_group: z
-      .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
-      .optional(),
-    address: fullAddressValidationSchema,
-    guardian: z.array(guardianValidationSchema),
-    local_guardian: guardianValidationSchema,
-    admission_semester: z.string().optional(),
-    academic_department: z.string().optional(),
-    is_deleted: z.boolean().default(false).optional(),
+      emergency_contact_number: z
+        .string()
+        .refine(isValidBangladeshContactNumber, {
+          message: 'Emergency contact number is not valid',
+        }),
+      blood_group: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+        .optional(),
+      address: fullAddressValidationSchema,
+      guardian: z.array(guardianValidationSchema),
+      local_guardian: guardianValidationSchema,
+      admission_semester: z.string().optional(),
+      academic_department: z.string().optional(),
+    }),
   }),
 });
 
-export default studentValidationSchema;
+export const studentValidations = {
+  createStudentValidation: studentValidation,
+};
