@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { StudentServices } from './student.sevice';
+import { StudentServices } from './student.service';
 
 const findAllStudents = async (
   req: Request,

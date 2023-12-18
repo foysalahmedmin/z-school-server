@@ -55,7 +55,7 @@ const guardianValidationSchema = z.object({
   address: addressValidationSchema.optional(),
 });
 
-const studentValidation = z.object({
+const studentValidationSchema = z.object({
   body: z.object({
     username: z.string(),
     password: z.string().min(6).max(12),
@@ -86,6 +86,42 @@ const studentValidation = z.object({
   }),
 });
 
+const updateStudentValidationSchema = z.object({
+  body: z.object({
+    username: z.string().optional(),
+    password: z.string().min(6).max(12).optional(),
+    student: z.object({
+      name: nameValidationSchema.optional(),
+      profile_image: z.string().url().optional(),
+      avatar: z.string().url().optional(),
+      gender: z.enum(['male', 'female', 'others']).optional(),
+      date_of_birth: z.string().optional(),
+      email: z.string().email().optional(),
+      contact_number: z
+        .string()
+        .refine(isValidBangladeshContactNumber, {
+          message: 'Contact number is not valid',
+        })
+        .optional(),
+      emergency_contact_number: z
+        .string()
+        .refine(isValidBangladeshContactNumber, {
+          message: 'Emergency contact number is not valid',
+        })
+        .optional(),
+      blood_group: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+        .optional(),
+      address: fullAddressValidationSchema.optional(),
+      guardian: z.array(guardianValidationSchema).optional(),
+      local_guardian: guardianValidationSchema.optional(),
+      admission_semester: z.string().optional(),
+      academic_department: z.string().optional(),
+    }),
+  }),
+});
+
 export const studentValidations = {
-  createStudentValidation: studentValidation,
+  createStudentValidation: studentValidationSchema,
+  updateStudentValidationSchema,
 };
