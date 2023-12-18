@@ -1,4 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status';
+import catchAsync from '../../utils/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 import { StudentServices } from './student.service';
 
 const findAllStudents = async (
@@ -38,6 +41,19 @@ const findOneStudent = async (
   }
 };
 
+const updateStudent = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const { student } = req.body;
+  const result = await StudentServices.updateStudentIntoDB(id, student);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Student is updated successfully',
+    data: result,
+  });
+});
+
 const deleteOneStudent = async (
   req: Request,
   res: Response,
@@ -60,5 +76,6 @@ const deleteOneStudent = async (
 export const StudentController = {
   findAllStudents,
   findOneStudent,
+  updateStudent,
   deleteOneStudent,
 };
