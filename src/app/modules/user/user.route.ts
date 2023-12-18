@@ -6,7 +6,7 @@ import { userController } from './user.controller';
 const router = express.Router();
 
 router.post(
-  '/create',
+  '/student',
   validateRequest(studentValidations.createStudentValidation),
   userController.createStudent,
 );
