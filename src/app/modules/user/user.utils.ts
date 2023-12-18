@@ -1,5 +1,7 @@
 import { TAcademicSemester } from '../academic-semester/academic-semester.interface';
 import { User } from './user.model';
+// const ObjectId = mongoose.Types.ObjectId;
+// admission_semester: new ObjectId()
 
 const findLastStudentId = async () => {
   const lastStudent = await User.findOne({ role: 'student' }, { _id: 0, id: 1 })

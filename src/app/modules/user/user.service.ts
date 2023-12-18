@@ -56,6 +56,9 @@ const createStudentIntoDB = async (
 
     return newStudent;
   } catch (err: any) {
+    await session.commitTransaction();
+    await session.endSession();
+
     throw new Error(err);
   }
 };

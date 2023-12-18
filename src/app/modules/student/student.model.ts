@@ -170,7 +170,11 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
     },
     guardian: { type: [guardianSchema], required: true },
     local_guardian: { type: guardianSchema, required: true },
-    admission_semester: { type: Schema.Types.ObjectId },
+    admission_semester: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Academic-Semester',
+    },
     academic_department: { type: Schema.Types.ObjectId },
     is_deleted: { type: Boolean, default: false },
   },

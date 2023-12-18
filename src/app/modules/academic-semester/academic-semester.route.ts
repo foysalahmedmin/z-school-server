@@ -13,10 +13,10 @@ router.post(
   AcademicSemesterControllers.createAcademicSemester,
 );
 
-router.get('/:courseId', AcademicSemesterControllers.getSingleAcademicSemester);
+router.get('/:_id', AcademicSemesterControllers.getSingleAcademicSemester);
 
 router.patch(
-  '/:courseId',
+  '/:_id',
   validateRequest(
     AcademicSemesterValidations.updateAcademicSemesterValidationSchema,
   ),

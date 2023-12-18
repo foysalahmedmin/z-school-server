@@ -80,7 +80,7 @@ const studentValidationSchema = z.object({
       address: fullAddressValidationSchema,
       guardian: z.array(guardianValidationSchema),
       local_guardian: guardianValidationSchema,
-      admission_semester: z.string().optional(),
+      admission_semester: z.string(),
       academic_department: z.string().optional(),
     }),
   }),
