@@ -6,12 +6,12 @@ import { TStudent } from './student.interface';
 import { Student } from './student.model';
 import { studentUpdateDataModifier } from './student.utils';
 
-const findAllStudentsFromDB = async () => {
+const getAllStudentsFromDB = async () => {
   const result = await Student.find();
   return result;
 };
 
-const findOneStudentFromDB = async (id: string) => {
+const getSingleStudentFromDB = async (id: string) => {
   const result = await Student.find({ id: id });
   return result;
 };
@@ -66,8 +66,8 @@ const deleteOneStudentFromDB = async (id: string) => {
 };
 
 export const StudentServices = {
-  findAllStudentsFromDB,
-  findOneStudentFromDB,
+  getAllStudentsFromDB,
+  getSingleStudentFromDB,
   updateStudentIntoDB,
   deleteOneStudentFromDB,
 };
