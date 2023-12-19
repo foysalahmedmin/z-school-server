@@ -26,6 +26,11 @@ export interface TGuardian {
   address?: TAddress;
 }
 
+export interface TMainGuardian {
+  first_guardian: TGuardian;
+  second_guardian?: TGuardian;
+}
+
 export interface TStudent {
   id: string;
   user: Types.ObjectId;
@@ -40,9 +45,9 @@ export interface TStudent {
   emergency_contact_number: string;
   blood_group?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   address: TFullAddress;
-  guardian: TGuardian[];
+  guardian: TMainGuardian;
   local_guardian?: TGuardian;
-  admission_semester?: Types.ObjectId;
+  admission_semester: Types.ObjectId;
   academic_department?: Types.ObjectId;
   is_deleted: boolean;
 }

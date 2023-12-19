@@ -13,10 +13,10 @@ router.post(
 
 router.get('/', FacultyControllers.getAllFaculties);
 
-router.get('/:id', FacultyControllers.getSingleFaculty);
+router.get('/:_id', FacultyControllers.getSingleFaculty);
 
 router.patch(
-  '/:id',
+  '/:_id',
   validateRequest(facultyValidations.updateFacultyValidationSchema),
   FacultyControllers.updateFaculty,
 );

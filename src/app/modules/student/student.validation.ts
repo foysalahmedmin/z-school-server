@@ -55,6 +55,11 @@ const guardianValidationSchema = z.object({
   address: addressValidationSchema.optional(),
 });
 
+const mainGuardianValidationSchema = z.object({
+  first_guardian: guardianValidationSchema,
+  second_guardian: guardianValidationSchema.optional(),
+});
+
 const studentValidationSchema = z.object({
   body: z.object({
     username: z.string(),
@@ -113,9 +118,9 @@ const updateStudentValidationSchema = z.object({
         .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
         .optional(),
       address: fullAddressValidationSchema.optional(),
-      guardian: z.array(guardianValidationSchema).optional(),
+      guardian: mainGuardianValidationSchema.optional(),
       local_guardian: guardianValidationSchema.optional(),
-      admission_semester: z.string().optional(),
+      admission_semester: z.string(),
       academic_department: z.string().optional(),
     }),
   }),

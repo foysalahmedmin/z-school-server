@@ -9,7 +9,7 @@ const createFaculty = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic faculty is created successfully',
+    message: 'Faculty is created successfully',
     data: result,
   });
 });
@@ -20,31 +20,31 @@ const getAllFaculties = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic faculties are retrieved successfully',
+    message: 'Faculties are retrieved successfully',
     data: result,
   });
 });
 
 const getSingleFaculty = catchAsync(async (req, res) => {
-  const { facultyId } = req.params;
-  const result = await FacultyServices.getSingleFacultyFromDB(facultyId);
+  const { _id } = req.params;
+  const result = await FacultyServices.getSingleFacultyFromDB(_id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic faculty is retrieved successfully',
+    message: 'Faculty is retrieved successfully',
     data: result,
   });
 });
 
 const updateFaculty = catchAsync(async (req, res) => {
-  const { facultyId } = req.params;
-  const result = await FacultyServices.updateFacultyIntoDB(facultyId, req.body);
+  const { _id } = req.params;
+  const result = await FacultyServices.updateFacultyIntoDB(_id, req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Academic faculty is updated successfully',
+    message: 'Faculty is updated successfully',
     data: result,
   });
 });

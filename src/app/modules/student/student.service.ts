@@ -4,6 +4,7 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TStudent } from './student.interface';
 import { Student } from './student.model';
+import { studentUpdateDataModifier } from './student.utils';
 
 const findAllStudentsFromDB = async () => {
   const result = await Student.find();
@@ -16,45 +17,7 @@ const findOneStudentFromDB = async (id: string) => {
 };
 
 const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
-  const { name, guardian, local_guardian, address, ...remainingStudentData } =
-    payload;
-
-  const modifiedUpdatedData: Record<string, unknown> = {
-    ...remainingStudentData,
-  };
-
-  if (name && Object.keys(name).length) {
-    for (const [key, value] of Object.entries(name)) {
-      modifiedUpdatedData[`name.${key}`] = value;
-    }
-  }
-
-  if (address && Object.keys(address).length) {
-    const { permanent, present } = address;
-    if (permanent && Object.keys(permanent).length) {
-      for (const [key, value] of Object.entries(permanent)) {
-        modifiedUpdatedData[`address.permanent.${key}`] = value;
-      }
-    }
-    if (present && Object.keys(present).length) {
-      for (const [key, value] of Object.entries(present)) {
-        modifiedUpdatedData[`address.present.${key}`] = value;
-      }
-    }
-  }
-
-  if (guardian && Object.keys(guardian[0]).length) {
-    for (const [key, value] of Object.entries(guardian[0])) {
-      modifiedUpdatedData[`guardian[0].${key}`] = value;
-    }
-  }
-
-  if (local_guardian && Object.keys(local_guardian).length) {
-    for (const [key, value] of Object.entries(local_guardian)) {
-      modifiedUpdatedData[`local_guardian.${key}`] = value;
-    }
-  }
-
+  const modifiedUpdatedData = await studentUpdateDataModifier(payload);
   const result = await Student.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,

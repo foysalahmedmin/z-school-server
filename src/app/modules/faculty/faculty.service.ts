@@ -11,13 +11,13 @@ const getAllFacultiesFromDB = async () => {
   return result;
 };
 
-const getSingleFacultyFromDB = async (id: string) => {
-  const result = await Faculty.findById(id);
+const getSingleFacultyFromDB = async (_id: string) => {
+  const result = await Faculty.findById(_id);
   return result;
 };
 
-const updateFacultyIntoDB = async (id: string, payload: Partial<TFaculty>) => {
-  const result = await Faculty.findOneAndUpdate({ _id: id }, payload, {
+const updateFacultyIntoDB = async (_id: string, payload: Partial<TFaculty>) => {
+  const result = await Faculty.findOneAndUpdate({ _id: _id }, payload, {
     new: true,
   });
   return result;

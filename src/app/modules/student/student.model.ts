@@ -3,6 +3,7 @@ import {
   TAddress,
   TFullAddress,
   TGuardian,
+  TMainGuardian,
   TName,
   TStudent,
   // TStudentMethods,
@@ -94,6 +95,16 @@ const guardianSchema = new Schema<TGuardian>({
   address: addressSchema,
 });
 
+const mainGuardianSchema = new Schema<TMainGuardian>({
+  first_guardian: {
+    type: addressSchema,
+    required: true,
+  },
+  second_guardian: {
+    type: addressSchema,
+  },
+});
+
 const StudentSchema = new Schema<TStudent, TStudentModel>(
   {
     id: { type: String, required: true, unique: true },
@@ -168,7 +179,7 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
       type: fullAddressSchema,
       required: true,
     },
-    guardian: { type: [guardianSchema], required: true },
+    guardian: { type: mainGuardianSchema, required: true },
     local_guardian: { type: guardianSchema, required: true },
     admission_semester: {
       type: Schema.Types.ObjectId,
