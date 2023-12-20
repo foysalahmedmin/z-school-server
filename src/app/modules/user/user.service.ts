@@ -52,7 +52,6 @@ const createStudentIntoDB = async (
     }
 
     await session.commitTransaction();
-    await session.endSession();
 
     return newStudent;
   } catch (err: any) {
