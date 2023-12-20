@@ -35,7 +35,7 @@ const createStudentIntoDB = async (
     session.startTransaction();
     userData.id = await generateStudentId(admissionSemester);
 
-    const newUser = await User.create([userData], { session }); //Array
+    const newUser = await User.create([userData], { session });
 
     if (!newUser.length) {
       throw new Error('Failed to create user');
@@ -56,10 +56,11 @@ const createStudentIntoDB = async (
 
     return newStudent;
   } catch (err: any) {
-    await session.commitTransaction();
-    await session.endSession();
+    await session.abortTransaction();
 
     throw new Error(err);
+  } finally {
+    await session.endSession();
   }
 };
 

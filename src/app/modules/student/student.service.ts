@@ -7,12 +7,26 @@ import { Student } from './student.model';
 import { studentUpdateDataModifier } from './student.utils';
 
 const getAllStudentsFromDB = async () => {
-  const result = await Student.find();
+  const result = await Student.find()
+    .populate('admission_semester')
+    .populate({
+      path: 'academic_department',
+      populate: {
+        path: 'faculty',
+      },
+    });
   return result;
 };
 
 const getSingleStudentFromDB = async (id: string) => {
-  const result = await Student.find({ id: id });
+  const result = await Student.findOne({ id: id })
+    .populate('admission_semester')
+    .populate({
+      path: 'academic_department',
+      populate: {
+        path: 'faculty',
+      },
+    });
   return result;
 };
 

@@ -17,15 +17,15 @@ const moduleRoutes = [
     route: StudentRoues,
   },
   {
-    path: '/faculty',
+    path: '/faculties',
     route: FacultyRoutes,
   },
   {
-    path: '/academic-semester',
+    path: '/academic-semesters',
     route: AcademicSemesterRoutes,
   },
   {
-    path: '/academic-department',
+    path: '/academic-departments',
     route: AcademicDepartmentRoutes,
   },
 ];

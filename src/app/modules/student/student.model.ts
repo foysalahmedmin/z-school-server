@@ -97,11 +97,11 @@ const guardianSchema = new Schema<TGuardian>({
 
 const mainGuardianSchema = new Schema<TMainGuardian>({
   first_guardian: {
-    type: addressSchema,
+    type: guardianSchema,
     required: true,
   },
   second_guardian: {
-    type: addressSchema,
+    type: guardianSchema,
   },
 });
 
@@ -141,7 +141,7 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
           "The gender field can only one of the following: 'male', 'female' or 'others'",
       },
     },
-    date_of_birth: { type: String },
+    date_of_birth: { type: Date },
     email: {
       type: String,
       required: true,
@@ -186,7 +186,10 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
       required: true,
       ref: 'Academic-Semester',
     },
-    academic_department: { type: Schema.Types.ObjectId },
+    academic_department: {
+      type: Schema.Types.ObjectId,
+      ref: 'Academic-Department',
+    },
     is_deleted: { type: Boolean, default: false },
   },
   {
