@@ -202,11 +202,11 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
 // virtual
 StudentSchema.virtual('full_name').get(function () {
   return (
-    this.name.first_name +
+    this.name?.first_name +
     ' ' +
-    this.name.middle_name +
+    this.name?.middle_name +
     ' ' +
-    this.name.last_name
+    this.name?.last_name
   );
 });
 

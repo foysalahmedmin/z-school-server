@@ -26,13 +26,13 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
-
   const result = await studentQuery.modelQuery;
   return result;
 };
 
 const getSingleStudentFromDB = async (id: string) => {
   const result = await Student.findOne({ id: id })
+    .populate('user')
     .populate('admission_semester')
     .populate({
       path: 'academic_department',
