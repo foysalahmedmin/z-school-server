@@ -1,10 +1,15 @@
+import mongoose from 'mongoose';
 import { TAcademicSemester } from '../academic-semester/academic-semester.interface';
-import { User } from './user.model';
-// const ObjectId = mongoose.Types.ObjectId;
-// admission_semester: new ObjectId()
+import { Student } from '../student/student.model';
+const ObjectId = mongoose.Types.ObjectId;
 
-const findLastStudentId = async () => {
-  const lastStudent = await User.findOne({ role: 'student' }, { _id: 0, id: 1 })
+const findLastStudentId = async (
+  admission_semester_id: string,
+): Promise<string | undefined> => {
+  const lastStudent = await Student.findOne(
+    { admission_semester: new ObjectId(admission_semester_id) },
+    { _id: 0, id: 1 },
+  )
     .sort({
       createdAt: -1,
     })
@@ -13,9 +18,11 @@ const findLastStudentId = async () => {
   return lastStudent?.id ? lastStudent.id : undefined;
 };
 
-export const generateStudentId = async (payload: TAcademicSemester) => {
+export const generateStudentId = async (
+  payload: Partial<TAcademicSemester>,
+) => {
   let currentId = (0).toString();
-  const lastStudentId = await findLastStudentId();
+  const lastStudentId = await findLastStudentId(payload._id as string);
 
   const lastStudentSemesterCode = lastStudentId?.substring(4, 6);
   const lastStudentYear = lastStudentId?.substring(0, 4);
