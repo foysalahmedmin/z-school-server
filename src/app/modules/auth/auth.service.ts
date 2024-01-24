@@ -3,6 +3,7 @@ import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
 import config from '../../config';
 import AppError from '../../errors/AppError';
+import { sendEmail } from '../../utils/sendEmail';
 import { User } from '../user/user.model';
 import { TJwtPayload, TLogin, TUpdatePassword } from './auth.interface';
 import { createToken, verifyToken } from './auth.utils';
@@ -151,8 +152,48 @@ const refreshToken = async (token: string) => {
   };
 };
 
+const forgetPassword = async (id: string) => {
+  const user = await User.isUserExistById(id);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  if (user?.is_deleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User is deleted!');
+  }
+
+  if (user?.status == 'blocked') {
+    throw new AppError(httpStatus.NOT_FOUND, 'User is blocked!');
+  }
+
+  const jwtPayload: TJwtPayload = {
+    _id: user._id,
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+  };
+
+  const resetToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_secret_expires_in as string,
+  );
+
+  const resetUILink = `${config.reset_password_ui_link}?id=${user.id}&token=${resetToken}`;
+
+  sendEmail({
+    to: user.email,
+    subject: 'Z-University Password Change Link',
+    text: 'Reset your password within 10 minuets',
+    html: resetUILink,
+  });
+};
+
 export const AuthServices = {
   loginUser,
   updatePassword,
   refreshToken,
+  forgetPassword,
 };

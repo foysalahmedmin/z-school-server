@@ -14,14 +14,10 @@ const createStudentIntoDB = async (
   password: string,
   payload: TStudent,
 ) => {
-  // Build in static method;
-  //   if (await Student.isUserExist(payload.id)) {
-  //     throw new Error('User already exist!');
-  //   }
-
   const userData: Partial<TUser> = {};
 
-  userData.username = username || 'user' + userData.id;
+  userData.email = payload.email;
+  userData.username = username || 'user' + userData?.id;
   userData.password = password || (config.default_password as string);
   userData.role = 'student';
 
