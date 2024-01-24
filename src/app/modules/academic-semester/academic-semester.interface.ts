@@ -1,3 +1,5 @@
+import { Types } from 'mongoose';
+
 export type TMonths =
   | 'January'
   | 'February'
@@ -16,7 +18,7 @@ export type TAcademicSemesterName = 'Autumn' | 'Summer' | 'Fall';
 export type TAcademicSemesterCode = '01' | '02' | '03';
 
 export type TAcademicSemester = {
-  _id?: string;
+  _id?: Types.ObjectId;
   name: TAcademicSemesterName;
   code: TAcademicSemesterCode;
   year: string;

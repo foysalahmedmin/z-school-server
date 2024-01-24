@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { TAcademicSemester } from '../academic-semester/academic-semester.interface';
 import { Student } from '../student/student.model';
 const ObjectId = mongoose.Types.ObjectId;
 
 const findLastStudentId = async (
-  admission_semester_id: string,
+  admission_semester_id: Types.ObjectId,
 ): Promise<string | undefined> => {
   const lastStudent = await Student.findOne(
     { admission_semester: new ObjectId(admission_semester_id) },
@@ -22,7 +22,7 @@ export const generateStudentId = async (
   payload: Partial<TAcademicSemester>,
 ) => {
   let currentId = (0).toString();
-  const lastStudentId = await findLastStudentId(payload._id as string);
+  const lastStudentId = await findLastStudentId(payload._id as Types.ObjectId);
 
   const lastStudentSemesterCode = lastStudentId?.substring(4, 6);
   const lastStudentYear = lastStudentId?.substring(0, 4);

@@ -32,6 +32,7 @@ export interface TMainGuardian {
 }
 
 export interface TStudent {
+  _id?: Types.ObjectId;
   id: string;
   user: Types.ObjectId;
   username: string;

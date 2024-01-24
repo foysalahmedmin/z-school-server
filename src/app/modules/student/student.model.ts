@@ -190,7 +190,7 @@ const StudentSchema = new Schema<TStudent, TStudentModel>(
       type: Schema.Types.ObjectId,
       ref: 'Academic-Department',
     },
-    is_deleted: { type: Boolean, default: false },
+    is_deleted: { type: Boolean, default: false, select: false },
   },
   {
     toJSON: {

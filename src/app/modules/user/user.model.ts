@@ -1,19 +1,22 @@
 import bcrypt from 'bcrypt';
 import mongoose, { Schema } from 'mongoose';
 import config from '../../config';
-import { TUser } from './user.interface';
+import { TUser, TUserModel } from './user.interface';
 
 const userSchema = new Schema<TUser>(
   {
     id: { type: String, unique: true, required: true },
     username: { type: String, unique: true, required: true },
+    email: { type: String, unique: true, required: true },
     password: {
       type: String,
       required: true,
       minlength: [6, 'the password should minimum 6 character'],
       maxlength: [12, 'the password should maximum 12 character'],
+      select: false,
     },
     need_password_change: { type: Boolean, default: false },
+    password_changed_at: { type: Date, select: false },
     role: {
       type: String,
       enum: ['admin', 'student', 'faculty'],
@@ -24,7 +27,7 @@ const userSchema = new Schema<TUser>(
       enum: ['in-progress', 'blocked'],
       default: 'in-progress',
     },
-    is_deleted: { type: Boolean, default: false },
+    is_deleted: { type: Boolean, default: false, select: false },
   },
   {
     timestamps: true,
@@ -40,7 +43,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// post save middleware/ hook
+// Post save middleware/ hook
 userSchema.post('save', function (document, next) {
   document.password = '';
   next();
@@ -62,4 +65,35 @@ userSchema.pre('aggregate', function (next) {
   next();
 });
 
-export const User = mongoose.model<TUser>('User', userSchema);
+// Methods
+userSchema.statics.isUserExist = async function (_id: string) {
+  return await User.findById(_id).select('+password +passwordChangedAt');
+};
+
+userSchema.statics.isUserExistById = async function (id: string) {
+  return await User.findOne({ id: id }).select('+password +passwordChangedAt');
+};
+
+userSchema.statics.isUserExistByUsername = async function (username: string) {
+  return await User.findOne({ username: username }).select(
+    '+password +passwordChangedAt',
+  );
+};
+
+userSchema.statics.isPasswordMatched = async function (
+  password: string,
+  hashedPassword: string,
+) {
+  return await bcrypt.compare(password, hashedPassword);
+};
+
+userSchema.statics.isJWTIssuedBeforeChangedPassword = async function (
+  passwordChangedTimestamp: Date,
+  JWTIssuedTimestamp: number,
+) {
+  const passwordChangedTime =
+    new Date(passwordChangedTimestamp).getTime() / 1000;
+  return passwordChangedTime > JWTIssuedTimestamp;
+};
+
+export const User = mongoose.model<TUser, TUserModel>('User', userSchema);

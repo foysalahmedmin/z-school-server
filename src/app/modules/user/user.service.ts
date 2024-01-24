@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import config from '../../config';
 import { AcademicSemester } from '../academic-semester/academic-semester.model';
+import { TFaculty } from '../faculty/faculty.interface';
+import { Faculty } from '../faculty/faculty.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
@@ -63,6 +65,12 @@ const createStudentIntoDB = async (
   }
 };
 
+const createFacultyIntoDB = async (payload: TFaculty) => {
+  const result = await Faculty.create(payload);
+  return result;
+};
+
 export const UserServices = {
   createStudentIntoDB,
+  createFacultyIntoDB,
 };
