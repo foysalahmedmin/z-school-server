@@ -4,9 +4,18 @@ export interface TLogin {
   password: string;
 }
 
-export interface TUpdatePassword {
-  currentPassword: string;
-  newPassword: string;
+export interface TChangePassword {
+  current_password: string;
+  new_password: string;
+}
+
+export interface TForgetPassword {
+  id: string;
+}
+
+export interface TResetPassword {
+  id: string;
+  new_password: string;
 }
 
 export interface TJwtPayload {

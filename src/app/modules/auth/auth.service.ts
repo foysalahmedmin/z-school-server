@@ -5,7 +5,13 @@ import config from '../../config';
 import AppError from '../../errors/AppError';
 import { sendEmail } from '../../utils/sendEmail';
 import { User } from '../user/user.model';
-import { TJwtPayload, TLogin, TUpdatePassword } from './auth.interface';
+import {
+  TChangePassword,
+  TForgetPassword,
+  TJwtPayload,
+  TLogin,
+  TResetPassword,
+} from './auth.interface';
 import { createToken, verifyToken } from './auth.utils';
 
 const loginUser = async (payload: TLogin) => {
@@ -16,11 +22,11 @@ const loginUser = async (payload: TLogin) => {
   }
 
   if (user?.is_deleted) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User is deleted!');
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted!');
   }
 
   if (user?.status == 'blocked') {
-    throw new AppError(httpStatus.NOT_FOUND, 'User is blocked!');
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked!');
   }
 
   if (!(await User.isPasswordMatched(payload?.password, user?.password))) {
@@ -55,53 +61,6 @@ const loginUser = async (payload: TLogin) => {
   };
 };
 
-const updatePassword = async (
-  userData: JwtPayload,
-  payload: TUpdatePassword,
-) => {
-  const user = await User.isUserExistById(userData.id);
-
-  if (!user) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
-  }
-
-  if (user?.is_deleted) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User is deleted!');
-  }
-
-  if (user?.status == 'blocked') {
-    throw new AppError(httpStatus.NOT_FOUND, 'User is blocked!');
-  }
-
-  if (
-    !(await User.isPasswordMatched(payload?.currentPassword, user?.password))
-  ) {
-    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched!');
-  }
-
-  const hashedNewPassword = await bcrypt.hash(
-    payload.newPassword,
-    Number(config.bcrypt_salt_rounds),
-  );
-
-  const updatedResult = await User.findByIdAndUpdate(
-    userData._id,
-    {
-      password: hashedNewPassword,
-      password_changed_at: new Date(),
-      need_password_change: false,
-    },
-    {
-      new: true,
-      runValidators: true,
-    },
-  );
-
-  const result = await User.findById(updatedResult?._id);
-
-  return result;
-};
-
 const refreshToken = async (token: string) => {
   const { id, iat } = verifyToken(token, config.jwt_refresh_secret as string);
 
@@ -112,11 +71,11 @@ const refreshToken = async (token: string) => {
   }
 
   if (user?.is_deleted) {
-    throw new AppError(httpStatus.NOT_FOUND, 'User is deleted!');
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted!');
   }
 
   if (user?.status == 'blocked') {
-    throw new AppError(httpStatus.NOT_FOUND, 'User is blocked!');
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked!');
   }
 
   if (
@@ -152,8 +111,11 @@ const refreshToken = async (token: string) => {
   };
 };
 
-const forgetPassword = async (id: string) => {
-  const user = await User.isUserExistById(id);
+const changePassword = async (
+  userData: JwtPayload,
+  payload: TChangePassword,
+) => {
+  const user = await User.isUserExistById(userData.id);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
@@ -165,6 +127,51 @@ const forgetPassword = async (id: string) => {
 
   if (user?.status == 'blocked') {
     throw new AppError(httpStatus.NOT_FOUND, 'User is blocked!');
+  }
+
+  if (
+    !(await User.isPasswordMatched(payload?.current_password, user?.password))
+  ) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched!');
+  }
+
+  const hashedNewPassword = await bcrypt.hash(
+    payload.new_password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  const result = await User.findOneAndUpdate(
+    {
+      id: user.id,
+      role: user.role,
+    },
+    {
+      password: hashedNewPassword,
+      password_changed_at: new Date(),
+      need_password_change: false,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  return result;
+};
+
+const forgetPassword = async (payload: TForgetPassword) => {
+  const user = await User.isUserExistById(payload.id);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  if (user?.is_deleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted!');
+  }
+
+  if (user?.status == 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked!');
   }
 
   const jwtPayload: TJwtPayload = {
@@ -191,9 +198,55 @@ const forgetPassword = async (id: string) => {
   });
 };
 
+const resetPassword = async (payload: TResetPassword, token: string) => {
+  const user = await User.isUserExistById(payload.id);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
+  }
+
+  if (user?.is_deleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is deleted!');
+  }
+
+  if (user?.status == 'blocked') {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is blocked!');
+  }
+
+  const { id } = verifyToken(token, config.jwt_access_secret as string);
+
+  if (payload.id !== id) {
+    throw new AppError(httpStatus.FORBIDDEN, 'User is forbidden!');
+  }
+
+  const hashedNewPassword = await bcrypt.hash(
+    payload.new_password,
+    Number(config.bcrypt_salt_rounds),
+  );
+
+  const result = await User.findByIdAndUpdate(
+    {
+      id: user.id,
+      role: user.role,
+    },
+    {
+      password: hashedNewPassword,
+      password_changed_at: new Date(),
+      need_password_change: false,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  return result;
+};
+
 export const AuthServices = {
   loginUser,
-  updatePassword,
   refreshToken,
+  changePassword,
   forgetPassword,
+  resetPassword,
 };
