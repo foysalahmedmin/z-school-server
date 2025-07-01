@@ -1,1 +1,1 @@
-﻿# z-university
+﻿# Z SCHOOL

@@ -1,12 +1,12 @@
 import mongoose from 'mongoose';
 import config from '../../config';
 import { AcademicSemester } from '../academic-semester/academic-semester.model';
-import { TFaculty } from '../faculty/faculty.interface';
 import { Faculty } from '../faculty/faculty.model';
-import { TStudent } from '../student/student.interface';
+import { TFaculty } from '../faculty/faculty.type';
 import { Student } from '../student/student.model';
-import { TUser } from './user.interface';
+import { TStudent } from '../student/student.type';
 import { User } from './user.model';
+import { TUser } from './user.type';
 import { generateStudentId } from './user.utils';
 
 const createStudentIntoDB = async (

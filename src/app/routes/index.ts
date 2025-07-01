@@ -1,32 +1,37 @@
 import express from 'express';
-import { AcademicDepartmentRoutes } from '../modules/academic-department/academic-department.route';
-import { AcademicSemesterRoutes } from '../modules/academic-semester/academic-semester.route';
-import { FacultyRoutes } from '../modules/faculty/faculty.route';
-import { StudentRoues } from '../modules/student/student.route';
-import { UserRoutes } from '../modules/user/user.route';
+import { academicDepartmentRoutes } from '../modules/academic-department/academic-department.route';
+import { academicSemesterRoutes } from '../modules/academic-semester/academic-semester.route';
+import { authRoutes } from '../modules/auth/auth.route';
+import { facultyRoutes } from '../modules/faculty/faculty.route';
+import { studentRoues } from '../modules/student/student.route';
+import { userRoutes } from '../modules/user/user.route';
 
 const router = express.Router();
 
 const moduleRoutes = [
   {
+    path: '/auth',
+    route: authRoutes,
+  },
+  {
     path: '/users',
-    route: UserRoutes,
+    route: userRoutes,
   },
   {
     path: '/students',
-    route: StudentRoues,
+    route: studentRoues,
   },
   {
     path: '/faculties',
-    route: FacultyRoutes,
+    route: facultyRoutes,
   },
   {
     path: '/academic-semesters',
-    route: AcademicSemesterRoutes,
+    route: academicSemesterRoutes,
   },
   {
     path: '/academic-departments',
-    route: AcademicDepartmentRoutes,
+    route: academicDepartmentRoutes,
   },
 ];
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import validateRequest from '../../middlewares/validateRequest';
+import validation from '../../middlewares/validation.middleware';
 import { AcademicDepartmentControllers } from './academic-department.controller';
 import { AcademicDepartmentValidation } from './academic-department.validation';
 
@@ -13,10 +13,10 @@ router.get('/:_id', AcademicDepartmentControllers.getSingleAcademicDepartment);
 
 router.patch(
   '/:_id',
-  validateRequest(
+  validation(
     AcademicDepartmentValidation.updateAcademicDepartmentValidationSchema,
   ),
   AcademicDepartmentControllers.updateAcademicDepartment,
 );
 
-export const AcademicDepartmentRoutes = router;
+export const academicDepartmentRoutes = router;

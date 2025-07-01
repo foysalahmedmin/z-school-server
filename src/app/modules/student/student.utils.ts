@@ -1,4 +1,4 @@
-import { TStudent } from './student.interface';
+import { TStudent } from './student.type';
 
 export const studentUpdateDataModifier = async (payload: Partial<TStudent>) => {
   try {

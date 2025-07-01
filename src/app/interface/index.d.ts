@@ -8,4 +8,6 @@ declare global {
   }
 }
 
-export type TUserRole = 'admin' | 'student' | 'faculty';
+declare module 'express-session' {
+  interface Session {}
+}

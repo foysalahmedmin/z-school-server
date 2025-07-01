@@ -1,20 +1,18 @@
-import { TGenericErrorResponse } from '../interface/error.interface';
+import { MongoServerError } from 'mongodb';
+import { TErrorResponse, TSources } from '../types/error-response.type';
 
-const handleDuplicateError = (err: any): TGenericErrorResponse => {
-  const errorSources = Object.entries(err?.keyValue).map((val) => {
-    const [key, value] = val;
-    return {
-      path: key || '',
-      message: `${value} is already exists`,
-    };
-  });
-
-  const statusCode = 400;
+const handleDuplicateError = (err: MongoServerError): TErrorResponse => {
+  const sources: TSources = Object.entries(err.keyValue ?? {}).map(
+    ([key, value]) => ({
+      path: key,
+      message: `${value} already exists`,
+    }),
+  );
 
   return {
-    statusCode,
-    message: 'Invalid ID',
-    errorSources,
+    status: 400,
+    message: 'Duplicate key error',
+    sources,
   };
 };
 

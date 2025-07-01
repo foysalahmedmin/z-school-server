@@ -1,27 +1,28 @@
 import { Types } from 'mongoose';
-export interface TLogin {
+import { TRole } from '../../types/role';
+export type TLogin = {
   id: string;
   password: string;
-}
+};
 
-export interface TChangePassword {
+export type TChangePassword = {
   current_password: string;
   new_password: string;
-}
+};
 
-export interface TForgetPassword {
+export type TForgetPassword = {
   id: string;
-}
+};
 
-export interface TResetPassword {
+export type TResetPassword = {
   id: string;
   new_password: string;
-}
+};
 
-export interface TJwtPayload {
+export type TJwtPayload = {
   _id?: Types.ObjectId;
   id: string;
   username: string;
   email: string;
-  role: 'admin' | 'student' | 'faculty';
-}
+  role: TRole;
+};

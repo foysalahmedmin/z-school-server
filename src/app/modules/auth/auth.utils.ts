@@ -1,5 +1,5 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { TJwtPayload } from './auth.interface';
+import { TJwtPayload } from './auth.type';
 
 export const createToken = (
   jwtPayload: Partial<TJwtPayload>,

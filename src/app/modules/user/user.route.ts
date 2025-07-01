@@ -1,5 +1,5 @@
 import express from 'express';
-import validateRequest from '../../middlewares/validateRequest';
+import validation from '../../middlewares/validation.middleware';
 import { studentValidations } from '../student/student.validation';
 import { userController } from './user.controller';
 
@@ -7,14 +7,14 @@ const router = express.Router();
 
 router.post(
   '/student',
-  validateRequest(studentValidations.createStudentValidation),
+  validation(studentValidations.createStudentValidation),
   userController.createStudent,
 );
 
 router.post(
   '/faculty',
-  validateRequest(studentValidations.createStudentValidation),
+  validation(studentValidations.createStudentValidation),
   userController.createStudent,
 );
 
-export const UserRoutes = router;
+export const userRoutes = router;

@@ -1,8 +1,8 @@
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import { JwtPayload } from 'jsonwebtoken';
+import AppError from '../../builder/AppError';
 import config from '../../config';
-import AppError from '../../errors/AppError';
 import { sendEmail } from '../../utils/sendEmail';
 import { User } from '../user/user.model';
 import {
@@ -11,7 +11,7 @@ import {
   TJwtPayload,
   TLogin,
   TResetPassword,
-} from './auth.interface';
+} from './auth.type';
 import { createToken, verifyToken } from './auth.utils';
 
 const loginUser = async (payload: TLogin) => {
@@ -192,7 +192,7 @@ const forgetPassword = async (payload: TForgetPassword) => {
 
   sendEmail({
     to: user.email,
-    subject: 'Z-University Password Change Link',
+    subject: 'z-school Password Change Link',
     text: 'Reset your password within 10 minuets',
     html: resetUILink,
   });

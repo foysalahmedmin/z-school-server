@@ -1,5 +1,5 @@
 import express from 'express';
-import validateRequest from '../../middlewares/validateRequest';
+import validation from '../../middlewares/validation.middleware';
 import { StudentController } from './student.controller';
 import { studentValidations } from './student.validation';
 
@@ -9,9 +9,9 @@ router.get('/', StudentController.getAllStudents);
 router.get('/:id', StudentController.getSingleStudent);
 router.patch(
   '/:id',
-  validateRequest(studentValidations.updateStudentValidationSchema),
+  validation(studentValidations.updateStudentValidationSchema),
   StudentController.updateStudent,
 );
 router.delete('/:id', StudentController.deleteOneStudent);
 
-export const StudentRoues = router;
+export const studentRoues = router;

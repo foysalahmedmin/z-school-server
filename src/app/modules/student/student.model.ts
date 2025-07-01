@@ -8,7 +8,7 @@ import {
   TStudent,
   // TStudentMethods,
   TStudentModel,
-} from './student.interface';
+} from './student.type';
 
 function capitalizeValidator(value: string) {
   const correctValue =

@@ -1,5 +1,5 @@
 import mongoose, { Types } from 'mongoose';
-import { TAcademicSemester } from '../academic-semester/academic-semester.interface';
+import { TAcademicSemester } from '../academic-semester/academic-semester.type';
 import { Student } from '../student/student.model';
 const ObjectId = mongoose.Types.ObjectId;
 

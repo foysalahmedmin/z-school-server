@@ -1,37 +1,37 @@
 import { Model, Types } from 'mongoose';
 
-export interface TName {
+export type TName = {
   first_name: string;
   middle_name?: string;
   last_name?: string;
-}
+};
 
-export interface TAddress {
+export type TAddress = {
   country: string;
   street: string;
   city: string;
   details?: string;
-}
+};
 
-export interface TFullAddress {
+export type TFullAddress = {
   present?: TAddress;
   permanent: TAddress;
-}
+};
 
-export interface TGuardian {
+export type TGuardian = {
   name: string;
   relation: string;
   occupation: string;
   contact_number: string;
   address?: TAddress;
-}
+};
 
-export interface TMainGuardian {
+export type TMainGuardian = {
   first_guardian: TGuardian;
   second_guardian?: TGuardian;
-}
+};
 
-export interface TStudent {
+export type TStudent = {
   _id?: Types.ObjectId;
   id: string;
   user: Types.ObjectId;
@@ -51,7 +51,7 @@ export interface TStudent {
   admission_semester: Types.ObjectId;
   academic_department?: Types.ObjectId;
   is_deleted: boolean;
-}
+};
 
 // For static methods;
 export interface TStudentModel extends Model<TStudent> {
