@@ -1,10 +1,11 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { ExpiresIn } from '../../config';
 import { TJwtPayload } from './auth.type';
 
 export const createToken = (
   jwtPayload: Partial<TJwtPayload>,
   secret: string,
-  expiresIn: string,
+  expiresIn: ExpiresIn | number,
 ) => {
   return jwt.sign(jwtPayload, secret, { expiresIn });
 };

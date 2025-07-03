@@ -1,15 +1,21 @@
 import express from 'express';
 import auth from '../../middlewares/auth.middleware';
 import validation from '../../middlewares/validation.middleware';
-import { AuthControllers } from './auth.controller';
-import { AuthValidations } from './auth.validation';
+import * as AuthControllers from './auth.controller';
+import * as AuthValidations from './auth.validation';
 
 const router = express.Router();
 
 router.post(
-  '/login',
-  validation(AuthValidations.loginValidationSchema),
-  AuthControllers.loginUser,
+  '/signin',
+  validation(AuthValidations.signinValidationSchema),
+  AuthControllers.signin,
+);
+
+router.post(
+  '/signup',
+  validation(AuthValidations.signupValidationSchema),
+  AuthControllers.signup,
 );
 
 router.post(
@@ -20,7 +26,7 @@ router.post(
 
 router.patch(
   '/change-password',
-  auth('admin', 'student', 'faculty'),
+  auth('admin', 'faculty', 'student'),
   validation(AuthValidations.changePasswordValidationSchema),
   AuthControllers.changePassword,
 );
@@ -36,5 +42,13 @@ router.patch(
   validation(AuthValidations.resetPasswordValidationSchema),
   AuthControllers.resetPassword,
 );
+
+router.post(
+  '/email-verification-source',
+  auth('admin', 'faculty', 'student'),
+  AuthControllers.emailVerificationSource,
+);
+
+router.post('/email-verification', AuthControllers.emailVerification);
 
 export const authRoutes = router;

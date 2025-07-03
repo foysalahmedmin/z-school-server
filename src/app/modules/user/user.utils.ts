@@ -1,13 +1,13 @@
 import mongoose, { Types } from 'mongoose';
-import { TAcademicSemester } from '../academic-semester/academic-semester.type';
+import { TSemester } from '../academic-semester/academic-semester.type';
 import { Student } from '../student/student.model';
 const ObjectId = mongoose.Types.ObjectId;
 
 const findLastStudentId = async (
-  admission_semester_id: Types.ObjectId,
+  semester_id: Types.ObjectId,
 ): Promise<string | undefined> => {
   const lastStudent = await Student.findOne(
-    { admission_semester: new ObjectId(admission_semester_id) },
+    { semester: new ObjectId(semester_id) },
     { _id: 0, id: 1 },
   )
     .sort({
@@ -18,9 +18,7 @@ const findLastStudentId = async (
   return lastStudent?.id ? lastStudent.id : undefined;
 };
 
-export const generateStudentId = async (
-  payload: Partial<TAcademicSemester>,
-) => {
+export const generateStudentCode = async (payload: Partial<TSemester>) => {
   let currentId = (0).toString();
   const lastStudentId = await findLastStudentId(payload._id as Types.ObjectId);
 
@@ -39,7 +37,7 @@ export const generateStudentId = async (
   }
 
   const incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
-  const currentFullId = `${payload.year}${payload.code}${incrementId}`;
+  const code = `${payload.year}${payload.code}${incrementId}`;
 
-  return currentFullId;
+  return code;
 };

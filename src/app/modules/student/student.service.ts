@@ -12,9 +12,9 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const studentQuery = new AppQuery(
     Student.find()
       .populate('user')
-      .populate('admission_semester')
+      .populate('semester')
       .populate({
-        path: 'academic_department',
+        path: 'department',
         populate: {
           path: 'faculty',
         },
@@ -33,9 +33,9 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
 const getSingleStudentFromDB = async (id: string) => {
   const result = await Student.findOne({ id: id })
     .populate('user')
-    .populate('admission_semester')
+    .populate('semester')
     .populate({
-      path: 'academic_department',
+      path: 'department',
       populate: {
         path: 'faculty',
       },

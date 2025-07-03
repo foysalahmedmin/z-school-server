@@ -1,29 +1,25 @@
 import mongoose from 'mongoose';
 import config from '../../config';
-import { AcademicSemester } from '../academic-semester/academic-semester.model';
 import { Faculty } from '../faculty/faculty.model';
 import { TFaculty } from '../faculty/faculty.type';
 import { Student } from '../student/student.model';
 import { TStudent } from '../student/student.type';
 import { User } from './user.model';
-import { TUser } from './user.type';
-import { generateStudentId } from './user.utils';
+import { TUser, TUserDocument } from './user.type';
+import { generateStudentCode } from './user.utils';
 
 const createStudentIntoDB = async (
-  username: string,
+  email: string,
   password: string,
   payload: TStudent,
 ) => {
   const userData: Partial<TUser> = {};
 
-  userData.email = payload.email;
-  userData.username = username || 'user' + userData?.id;
+  userData.email = email;
   userData.password = password || (config.default_password as string);
   userData.role = 'student';
 
-  const admissionSemester = await AcademicSemester.findById(
-    payload.admission_semester,
-  );
+  const admissionSemester = await Semester.findById(payload.semester);
   if (!admissionSemester) {
     throw new Error('Admission semester not found');
   }
@@ -31,17 +27,16 @@ const createStudentIntoDB = async (
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
-    userData.id = await generateStudentId(admissionSemester);
+    const [createdUser] = (await User.create([userData], {
+      session,
+    })) as TUserDocument[];
 
-    const newUser = await User.create([userData], { session });
-
-    if (!newUser.length) {
+    if (!createdUser) {
       throw new Error('Failed to create user');
     }
 
-    payload.id = newUser[0].id;
-    payload.username = newUser[0].username;
-    payload.user = newUser[0]._id;
+    payload.code = await generateStudentCode(admissionSemester);
+    payload.user = createdUser._id;
 
     const newStudent = await Student.create([payload], { session });
 

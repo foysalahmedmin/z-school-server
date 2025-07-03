@@ -3,8 +3,9 @@ import httpStatus from 'http-status';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import AppError from '../builder/AppError';
 import config from '../config';
+import { TJwtPayload } from '../modules/auth/auth.type';
 import { User } from '../modules/user/user.model';
-import { TRole } from '../types/role';
+import { TRole } from '../modules/user/user.type';
 import catchAsync from '../utils/catchAsync';
 
 const auth = (...roles: TRole[]) => {
@@ -26,6 +27,13 @@ const auth = (...roles: TRole[]) => {
 
       const { _id, role, iat } = decoded;
 
+      if (!_id || !role || typeof iat !== 'number') {
+        throw new AppError(
+          httpStatus.UNAUTHORIZED,
+          'You do not have the necessary permissions to access this resource.',
+        );
+      }
+
       const user = await User.isUserExist(_id);
       if (!user) {
         throw new AppError(httpStatus.NOT_FOUND, 'User not found!');
@@ -39,13 +47,7 @@ const auth = (...roles: TRole[]) => {
         throw new AppError(httpStatus.FORBIDDEN, 'User is blocked!');
       }
 
-      if (
-        user?.password_changed_at &&
-        (await User.isJWTIssuedBeforeChangedPassword(
-          user.password_changed_at,
-          iat as number,
-        ))
-      ) {
+      if (user?.password_changed_at && user.isPasswordChanged(iat)) {
         throw new AppError(
           httpStatus.UNAUTHORIZED,
           'You do not have the necessary permissions to access this resource.',
@@ -58,7 +60,7 @@ const auth = (...roles: TRole[]) => {
           'You do not have the necessary permissions to access this resource.',
         );
       }
-      req.user = decoded as JwtPayload;
+      req.user = decoded as JwtPayload & TJwtPayload;
       next();
     },
   );

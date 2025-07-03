@@ -22,49 +22,36 @@ export type TGuardian = {
   name: string;
   relation: string;
   occupation: string;
-  contact_number: string;
+  email: string;
+  phone: string;
   address?: TAddress;
 };
 
-export type TMainGuardian = {
-  first_guardian: TGuardian;
-  second_guardian?: TGuardian;
-};
-
 export type TStudent = {
-  _id?: Types.ObjectId;
-  id: string;
-  user: Types.ObjectId;
-  username: string;
   name: TName;
-  profile_image?: string;
+  code: string;
+  user: Types.ObjectId;
+  email: string;
+  phone: string;
+  emergency_phone: string;
+  image?: string;
   avatar?: string;
   gender?: 'male' | 'female' | 'others';
   date_of_birth?: Date;
-  email: string;
-  contact_number: string;
-  emergency_contact_number: string;
   blood_group?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
   address: TFullAddress;
-  guardian: TMainGuardian;
+  guardian: TGuardian;
   local_guardian?: TGuardian;
-  admission_semester: Types.ObjectId;
-  academic_department?: Types.ObjectId;
+  department?: Types.ObjectId;
   is_deleted: boolean;
 };
 
-// For static methods;
-export interface TStudentModel extends Model<TStudent> {
-  isUserExist(username: string): Promise<TStudent | null>;
+export interface TStudentDocument extends TStudent, Document {
+  _id: Types.ObjectId;
+  softDelete(): Promise<TStudentDocument | null>;
 }
 
-// For instance methods;
-// export interface TStudentMethods {
-//   isUserExist(username: string): Promise<TStudent | null>;
-// }
-
-// export type TStudentModel = Model<
-//   TStudent,
-//   Record<string, never>,
-//   TStudentMethods
-// >;
+export type TStudentModel = Model<TStudentDocument> & {
+  isStudentExist(_id: string): Promise<TStudentDocument | null>;
+  isStudentExistByEmail(email: string): Promise<TStudentDocument | null>;
+};

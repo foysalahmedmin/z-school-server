@@ -1,13 +1,23 @@
 import bcrypt from 'bcrypt';
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Query, Schema } from 'mongoose';
 import config from '../../config';
-import { TUser, TUserModel } from './user.type';
+import { TUser, TUserDocument, TUserModel } from './user.type';
 
-const userSchema = new Schema<TUser>(
+const userSchema = new Schema<TUserDocument>(
   {
-    id: { type: String, unique: true, required: true },
-    username: { type: String, unique: true, required: true },
-    email: { type: String, unique: true, required: true },
+    name: {
+      type: String,
+      required: [true, 'Name is required'],
+      trim: true,
+      maxlength: [50, 'Name cannot exceed 50 characters'],
+    },
+    email: {
+      type: String,
+      required: true,
+      lowercase: true,
+      unique: true,
+      trim: true,
+    },
     password: {
       type: String,
       required: true,
@@ -15,11 +25,18 @@ const userSchema = new Schema<TUser>(
       maxlength: [12, 'the password should maximum 12 character'],
       select: false,
     },
-    need_password_change: { type: Boolean, default: false },
-    password_changed_at: { type: Date, select: false },
+    password_changed_at: { type: Date, default: Date.now, select: false },
     role: {
       type: String,
-      enum: ['admin', 'student', 'faculty'],
+      enum: [
+        'super-admin',
+        'admin',
+        'editor',
+        'author',
+        'contributor',
+        'subscriber',
+        'user',
+      ],
       required: true,
     },
     status: {
@@ -27,36 +44,70 @@ const userSchema = new Schema<TUser>(
       enum: ['in-progress', 'blocked'],
       default: 'in-progress',
     },
+    is_verified: { type: Boolean, default: false },
     is_deleted: { type: Boolean, default: false, select: false },
   },
   {
-    timestamps: true,
+    timestamps: {
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
+    },
   },
 );
 
-// Pre save middleware/ hook
-userSchema.pre('save', async function (next) {
-  this.password = await bcrypt.hash(
-    this.password,
-    Number(config.bcrypt_salt_rounds),
-  );
-  next();
-});
+userSchema.index(
+  { email: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { is_deleted: false },
+    name: 'unique_email_not_deleted',
+  },
+);
 
-// Post save middleware/ hook
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  delete user.password_changed_at;
+  delete user.is_deleted;
+  return user;
+};
+
 userSchema.post('save', function (document, next) {
   document.password = '';
   next();
 });
 
-// Query middleware/ hook
-userSchema.pre('find', function (next) {
-  this.find({ is_deleted: { $ne: true } });
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(
+      this.password,
+      Number(config.bcrypt_salt_rounds),
+    );
+    if (!this.isNew) {
+      this.password_changed_at = new Date();
+    }
+  }
+
+  if (this.isModified('email')) {
+    this.is_verified = false;
+  }
+
   next();
 });
 
-userSchema.pre('findOne', function (next) {
-  this.findOne({ is_deleted: { $ne: true } });
+userSchema.pre(/^find/, function (this: Query<TUser, TUser>, next) {
+  this.setQuery({
+    ...this.getQuery(),
+    is_deleted: { $ne: true },
+  });
+  next();
+});
+
+userSchema.pre(/^update/, function (this: Query<TUser, TUser>, next) {
+  this.setQuery({
+    ...this.getQuery(),
+    is_deleted: { $ne: true },
+  });
   next();
 });
 
@@ -65,35 +116,29 @@ userSchema.pre('aggregate', function (next) {
   next();
 });
 
-// Methods
 userSchema.statics.isUserExist = async function (_id: string) {
-  return await User.findById(_id).select('+password +passwordChangedAt');
+  return await this.findById(_id).select('+password +password_changed_at');
 };
 
-userSchema.statics.isUserExistById = async function (id: string) {
-  return await User.findOne({ id: id }).select('+password +passwordChangedAt');
-};
-
-userSchema.statics.isUserExistByUsername = async function (username: string) {
-  return await User.findOne({ username: username }).select(
-    '+password +passwordChangedAt',
+userSchema.statics.isUserExistByEmail = async function (email: string) {
+  return await this.findOne({ email: email }).select(
+    '+password +password_changed_at',
   );
 };
 
-userSchema.statics.isPasswordMatched = async function (
-  password: string,
-  hashedPassword: string,
-) {
-  return await bcrypt.compare(password, hashedPassword);
+userSchema.methods.softDelete = async function () {
+  this.is_deleted = true;
+  return await this.save();
 };
 
-userSchema.statics.isJWTIssuedBeforeChangedPassword = async function (
-  passwordChangedTimestamp: Date,
-  JWTIssuedTimestamp: number,
-) {
-  const passwordChangedTime =
-    new Date(passwordChangedTimestamp).getTime() / 1000;
-  return passwordChangedTime > JWTIssuedTimestamp;
+userSchema.methods.isPasswordChanged = function (jwtTimestamp: number) {
+  const passwordChangedTimestamp = Math.floor(
+    this.password_changed_at.getTime() / 1000,
+  );
+  return jwtTimestamp < passwordChangedTimestamp;
 };
 
-export const User = mongoose.model<TUser, TUserModel>('User', userSchema);
+export const User = mongoose.model<TUserDocument, TUserModel>(
+  'User',
+  userSchema,
+);
