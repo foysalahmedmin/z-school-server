@@ -21,4 +21,6 @@ router.patch(
   FacultyControllers.updateFaculty,
 );
 
-export const facultyRoutes = router;
+const facultyRoutes = router;
+
+export default facultyRoutes;

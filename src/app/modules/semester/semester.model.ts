@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { TSemester } from './academic-semester.type';
+import { TSemester } from './semester.type';
 
 const semesterSchema = new Schema<TSemester>(
   {
@@ -41,4 +41,4 @@ semesterSchema.pre('save', async function (next) {
   next();
 });
 
-export const Semester = model<TSemester>('semesters', semesterSchema);
+export const Semester = model<TSemester>('Semester', semesterSchema);

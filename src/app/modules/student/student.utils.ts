@@ -1,80 +1,100 @@
+import { Student } from '../student/student.model';
 import { TStudent } from './student.type';
 
-export const studentUpdateDataModifier = async (payload: Partial<TStudent>) => {
+export const findLastStudent = async (): Promise<{
+  code: string;
+} | null> => {
+  const student = await Student.findOne({}, { _id: 0, code: 1 })
+    .sort({ created_at: -1 })
+    .lean();
+  return student;
+};
+
+export const generateStudentCode = async () => {
+  let serial = 1;
+
+  const last_student = await findLastStudent();
+  if (last_student) {
+    serial = Number(last_student.code.split('-')[1] || 1) + 1;
+  }
+
+  const code = `Z-${serial.toString().padStart(6, '0')}`;
+
+  return code;
+};
+
+export const formatStudentUpdatePayload = async (
+  payload: Partial<TStudent>,
+): Promise<Record<string, unknown>> => {
   try {
-    const { name, guardian, local_guardian, address, ...remainingStudentData } =
-      payload;
+    const {
+      name,
+      address,
+      present_address,
+      guardian,
+      local_guardian,
+      ...remainingStudentData
+    } = payload;
 
     const modifiedUpdatedData: Record<string, unknown> = {
       ...remainingStudentData,
     };
 
-    if (name && Object.keys(name).length) {
+    // Handle name
+    if (name && typeof name === 'object') {
       for (const [key, value] of Object.entries(name)) {
         modifiedUpdatedData[`name.${key}`] = value;
       }
+    } else {
+      if (name) modifiedUpdatedData['name'] = name;
     }
 
-    if (address && Object.keys(address).length) {
-      const { permanent, present } = address;
-      if (permanent && Object.keys(permanent).length) {
-        for (const [key, value] of Object.entries(permanent)) {
-          modifiedUpdatedData[`address.permanent.${key}`] = value;
-        }
-      }
-      if (present && Object.keys(present).length) {
-        for (const [key, value] of Object.entries(present)) {
-          modifiedUpdatedData[`address.present.${key}`] = value;
-        }
+    // Handle permanent address
+    if (address && typeof address === 'object') {
+      for (const [key, value] of Object.entries(address)) {
+        modifiedUpdatedData[`address.${key}`] = value;
       }
     }
 
-    if (guardian && Object.keys(guardian).length) {
-      const { first_guardian, second_guardian } = guardian;
-      // first guardian;
-      if (first_guardian && Object.keys(first_guardian).length) {
-        const { address, ...remainingFirstGuardianData } = first_guardian;
-        if (address && Object.keys(address).length) {
-          for (const [key, value] of Object.entries(address)) {
-            modifiedUpdatedData[`guardian.first_guardian.address${key}`] =
-              value;
-          }
-        }
-        for (const [key, value] of Object.entries(remainingFirstGuardianData)) {
-          modifiedUpdatedData[`guardian.first_guardian.${key}`] = value;
-        }
-      }
-      // first guardian;
-      if (second_guardian && Object.keys(second_guardian).length) {
-        const { address, ...remainingSecondGuardianData } = second_guardian;
-        if (address && Object.keys(address).length) {
-          for (const [key, value] of Object.entries(address)) {
-            modifiedUpdatedData[`guardian.second_guardian.address${key}`] =
-              value;
-          }
-        }
-        for (const [key, value] of Object.entries(
-          remainingSecondGuardianData,
-        )) {
-          modifiedUpdatedData[`guardian.second_guardian.${key}`] = value;
-        }
+    // Handle present address
+    if (present_address && typeof present_address === 'object') {
+      for (const [key, value] of Object.entries(present_address)) {
+        modifiedUpdatedData[`present_address.${key}`] = value;
       }
     }
 
-    if (local_guardian && Object.keys(local_guardian).length) {
-      const { address, ...remainingLocalGuardianData } = local_guardian;
-      if (address && Object.keys(address).length) {
+    // Handle guardian (single guardian as per your schema)
+    if (guardian && typeof guardian === 'object') {
+      const { address, ...guardianFields } = guardian;
+
+      if (address && typeof address === 'object') {
         for (const [key, value] of Object.entries(address)) {
-          modifiedUpdatedData[`local_guardian.address${key}`] = value;
+          modifiedUpdatedData[`guardian.address.${key}`] = value;
         }
       }
-      for (const [key, value] of Object.entries(remainingLocalGuardianData)) {
+
+      for (const [key, value] of Object.entries(guardianFields)) {
+        modifiedUpdatedData[`guardian.${key}`] = value;
+      }
+    }
+
+    // Handle local_guardian
+    if (local_guardian && typeof local_guardian === 'object') {
+      const { address, ...localFields } = local_guardian;
+
+      if (address && typeof address === 'object') {
+        for (const [key, value] of Object.entries(address)) {
+          modifiedUpdatedData[`local_guardian.address.${key}`] = value;
+        }
+      }
+
+      for (const [key, value] of Object.entries(localFields)) {
         modifiedUpdatedData[`local_guardian.${key}`] = value;
       }
     }
 
     return modifiedUpdatedData;
   } catch (err) {
-    throw new Error('Fail to modify student update data');
+    throw new Error('Failed to format student update payload');
   }
 };

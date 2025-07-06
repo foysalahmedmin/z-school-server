@@ -3,6 +3,9 @@ import { TRole } from './user.type';
 export const ROLES: TRole[] = [
   'super-admin',
   'admin',
-  'faculty',
-  'student',
+  'editor',
+  'author',
+  'contributor',
+  'subscriber',
+  'user',
 ] as const;

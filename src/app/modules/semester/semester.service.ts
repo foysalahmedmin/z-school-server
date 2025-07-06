@@ -1,5 +1,5 @@
-import { TSemester } from './academic-semester.type';
 import { Semester } from './semester.model';
+import { TSemester } from './semester.type';
 
 const createSemesterIntoDB = async (payload: TSemester) => {
   const result = await Semester.create(payload);

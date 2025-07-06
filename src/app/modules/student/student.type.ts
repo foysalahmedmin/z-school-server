@@ -1,21 +1,10 @@
 import { Model, Types } from 'mongoose';
 
-export type TName = {
-  first_name: string;
-  middle_name?: string;
-  last_name?: string;
-};
-
 export type TAddress = {
   country: string;
   street: string;
   city: string;
   details?: string;
-};
-
-export type TFullAddress = {
-  present?: TAddress;
-  permanent: TAddress;
 };
 
 export type TGuardian = {
@@ -28,10 +17,10 @@ export type TGuardian = {
 };
 
 export type TStudent = {
-  name: TName;
   code: string;
-  user: Types.ObjectId;
+  name: string;
   email: string;
+  user: Types.ObjectId;
   phone: string;
   emergency_phone: string;
   image?: string;
@@ -39,7 +28,8 @@ export type TStudent = {
   gender?: 'male' | 'female' | 'others';
   date_of_birth?: Date;
   blood_group?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
-  address: TFullAddress;
+  address: TAddress;
+  present_address: TAddress;
   guardian: TGuardian;
   local_guardian?: TGuardian;
   department?: Types.ObjectId;

@@ -9,6 +9,7 @@ const userSchema = new Schema<TUserDocument>(
       type: String,
       required: [true, 'Name is required'],
       trim: true,
+      minlength: [2, 'Name must be at least 2 characters'],
       maxlength: [50, 'Name cannot exceed 50 characters'],
     },
     email: {
@@ -64,6 +65,7 @@ userSchema.index(
   },
 );
 
+// toJSON override to remove sensitive fields from output
 userSchema.methods.toJSON = function () {
   const user = this.toObject();
   delete user.password;
@@ -72,12 +74,15 @@ userSchema.methods.toJSON = function () {
   return user;
 };
 
+// Post save middleware/ hook
 userSchema.post('save', function (document, next) {
   document.password = '';
   next();
 });
 
+// Pre save middleware/ hook
 userSchema.pre('save', async function (next) {
+  // Hash password
   if (this.isModified('password')) {
     this.password = await bcrypt.hash(
       this.password,
@@ -88,6 +93,7 @@ userSchema.pre('save', async function (next) {
     }
   }
 
+  // Reset is_verified on email change
   if (this.isModified('email')) {
     this.is_verified = false;
   }
@@ -95,6 +101,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// Query middleware to exclude deleted users
 userSchema.pre(/^find/, function (this: Query<TUser, TUser>, next) {
   this.setQuery({
     ...this.getQuery(),
@@ -111,11 +118,13 @@ userSchema.pre(/^update/, function (this: Query<TUser, TUser>, next) {
   next();
 });
 
+// Aggregation pipeline
 userSchema.pre('aggregate', function (next) {
   this.pipeline().unshift({ $match: { is_deleted: { $ne: true } } });
   next();
 });
 
+// Static methods
 userSchema.statics.isUserExist = async function (_id: string) {
   return await this.findById(_id).select('+password +password_changed_at');
 };
@@ -126,6 +135,7 @@ userSchema.statics.isUserExistByEmail = async function (email: string) {
   );
 };
 
+// Instance methods
 userSchema.methods.softDelete = async function () {
   this.is_deleted = true;
   return await this.save();

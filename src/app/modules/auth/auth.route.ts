@@ -26,7 +26,7 @@ router.post(
 
 router.patch(
   '/change-password',
-  auth('admin', 'faculty', 'student'),
+  auth('admin', 'editor', 'author', 'contributor', 'subscriber', 'user'),
   validation(AuthValidations.changePasswordValidationSchema),
   AuthControllers.changePassword,
 );
@@ -45,10 +45,12 @@ router.patch(
 
 router.post(
   '/email-verification-source',
-  auth('admin', 'faculty', 'student'),
+  auth('admin', 'editor', 'author', 'contributor', 'subscriber', 'user'),
   AuthControllers.emailVerificationSource,
 );
 
 router.post('/email-verification', AuthControllers.emailVerification);
 
-export const authRoutes = router;
+const authRoutes = router;
+
+export default authRoutes;

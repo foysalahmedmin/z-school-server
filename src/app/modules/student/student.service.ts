@@ -2,11 +2,59 @@ import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import AppError from '../../builder/AppError';
 import AppQuery from '../../builder/AppQuery';
+import config from '../../config';
 import { User } from '../user/user.model';
+import { TUser, TUserDocument } from '../user/user.type';
 import { studentSearchableFields } from './student.constant';
 import { Student } from './student.model';
 import { TStudent } from './student.type';
-import { studentUpdateDataModifier } from './student.utils';
+import {
+  formatStudentUpdatePayload,
+  generateStudentCode,
+} from './student.utils';
+
+export const createStudentIntoDB = async (
+  email: string,
+  password: string,
+  payload: TStudent,
+) => {
+  const userData: Partial<TUser> = {};
+
+  userData.email = email;
+  userData.password = password || (config.default_password as string);
+  userData.role = 'student';
+
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+    const [createdUser] = (await User.create([userData], {
+      session,
+    })) as TUserDocument[];
+
+    if (!createdUser) {
+      throw new Error('Failed to create user');
+    }
+
+    payload.code = await generateStudentCode();
+    payload.user = createdUser._id;
+
+    const newStudent = await Student.create([payload], { session });
+
+    if (!newStudent.length) {
+      throw new Error('Failed to create student');
+    }
+
+    await session.commitTransaction();
+
+    return newStudent;
+  } catch (err: any) {
+    await session.abortTransaction();
+
+    throw new Error(err);
+  } finally {
+    await session.endSession();
+  }
+};
 
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
   const studentQuery = new AppQuery(
@@ -26,7 +74,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
-  const result = await studentQuery.modelQuery;
+  const result = await studentQuery.query;
   return result;
 };
 
@@ -44,7 +92,7 @@ const getSingleStudentFromDB = async (id: string) => {
 };
 
 const updateStudentIntoDB = async (id: string, payload: Partial<TStudent>) => {
-  const modifiedUpdatedData = await studentUpdateDataModifier(payload);
+  const modifiedUpdatedData = await formatStudentUpdatePayload(payload);
   const result = await Student.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
